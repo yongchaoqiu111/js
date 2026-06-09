@@ -1,0 +1,39 @@
+name: Publish pool snapshot
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm ci
+
+      - name: Publish snapshot JSON
+        env:
+          TRONGRID_API_KEY: ${{ secrets.TRONGRID_API_KEY }}
+          POOL_ADDRESS_1000: ${{ secrets.POOL_ADDRESS_1000 }}
+          POOL_ADDRESS_10000: ${{ secrets.POOL_ADDRESS_10000 }}
+          POOL_ADDRESS_100000: ${{ secrets.POOL_ADDRESS_100000 }}
+          POOL_ADDRESS_1000000: ${{ secrets.POOL_ADDRESS_1000000 }}
+          POOL_EXIT_ADDRESS: ${{ secrets.POOL_EXIT_ADDRESS }}
+        run: npm run publish
+
+      - name: Commit static JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/snapshot.json public/manifest.json
+          git diff --staged --quiet || git commit -m "chore: pool snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push

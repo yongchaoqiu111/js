@@ -1,0 +1,15 @@
+{
+  "name": "mmm-pool-snapshot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "pool-v4 算法 + 每日快照 JSON，供 Vercel CDN 分发",
+  "scripts": {
+    "publish": "node algorithm/publish-pool-snapshot.js --out public"
+  },
+  "dependencies": {
+    "bs58check": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
