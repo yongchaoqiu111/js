@@ -4,6 +4,9 @@
 
 与主工程 `Client-flutter` / `WSS-server` 分离；算法变更时请同步 `algorithm/` 目录。
 
+**开发文档（算法 + 匹配 + 4 档参数）**：Client-flutter 仓库  
+https://github.com/yongchaoqiu111/Client-flutter/blob/main/docs/pool-v4-dev-master-zh.md
+
 ## 目录
 
 ```
