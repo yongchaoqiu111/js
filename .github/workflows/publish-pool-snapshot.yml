@@ -5,6 +5,9 @@ on:
     - cron: '0 1 * * *'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
 
@@ -16,7 +19,28 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+
+      - name: Check required secrets
+        run: |
+          missing=0
+          for name in TRONGRID_API_KEY POOL_ADDRESS_1000 POOL_ADDRESS_10000 POOL_ADDRESS_100000 POOL_ADDRESS_1000000 POOL_EXIT_ADDRESS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing secret: $name — 请在仓库 Settings → Secrets → Actions 中配置"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "配置完成后在 Actions 页手动 Run workflow 重试"
+            exit 1
+          fi
+        env:
+          TRONGRID_API_KEY: ${{ secrets.TRONGRID_API_KEY }}
+          POOL_ADDRESS_1000: ${{ secrets.POOL_ADDRESS_1000 }}
+          POOL_ADDRESS_10000: ${{ secrets.POOL_ADDRESS_10000 }}
+          POOL_ADDRESS_100000: ${{ secrets.POOL_ADDRESS_100000 }}
+          POOL_ADDRESS_1000000: ${{ secrets.POOL_ADDRESS_1000000 }}
+          POOL_EXIT_ADDRESS: ${{ secrets.POOL_EXIT_ADDRESS }}
 
       - run: npm ci
 

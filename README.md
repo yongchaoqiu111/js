@@ -32,22 +32,36 @@ git remote add origin https://github.com/你的用户名/mmm-pool-snapshot.git
 git push -u origin main
 ```
 
-## 2. GitHub Secrets（Settings → Secrets and variables → Actions）
+## 2. GitHub Secrets（必配，否则 Action 会失败）
+
+仓库 → **Settings → Secrets and variables → Actions → New repository secret**
 
 | Secret | 说明 |
 |--------|------|
-| `TRONGRID_API_KEY` | 平台索引 Key |
-| `POOL_ADDRESS_1000` | 小额档买券地址 |
+| `TRONGRID_API_KEY` | 平台索引 Key（[trongrid.io](https://www.trongrid.io) 注册） |
+| `POOL_ADDRESS_1000` | 小额档买券地址（真实主网 T 地址） |
 | `POOL_ADDRESS_10000` | 中额档 |
 | `POOL_ADDRESS_100000` | 大额档 |
 | `POOL_ADDRESS_1000000` | 巨额档 |
 | `POOL_EXIT_ADDRESS` | 出场池地址（各档共用） |
 
+未配置时脚本会用占位地址，TronGrid 返回 HTTP 400，`publish` 步骤 exit code 1。
+
 ## 3. 手动跑一次 Action
 
 Actions → **Publish pool snapshot** → **Run workflow**
 
-成功后 `public/snapshot.json` 会有全队 **付款池 + 收款池** 数据。
+成功后 `public/snapshot.json` 里 `ok: true`，含全队 **付款池 + 收款池** 数据。
+
+### Action 失败排查
+
+| 现象 | 原因 | 处理 |
+|------|------|------|
+| `npm ci` 失败 | 缺少 `package-lock.json` | 已随仓库提交，拉最新 main |
+| `Missing secret` | Secrets 未配 | 按上表添加后重跑 |
+| `TronGrid ... HTTP 400` | 池地址无效或占位 | 改成真实主网地址 |
+| `HTTP 429` | Key 配额用尽 | 换 Key 或等配额恢复 |
+| Node 20 黄色警告 | Actions 弃用提示 | 已改用 Node 24，可忽略旧邮件 |
 
 ## 4. Vercel 连接本仓库
 
